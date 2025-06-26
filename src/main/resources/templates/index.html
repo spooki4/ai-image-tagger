@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 이미지 태그 생성기</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 2em; background-color: #f4f7f6; color: #333; }
+        .container { max-width: 900px; margin: auto; }
+        h1 { color: #2c3e50; text-align: center; }
+        .upload-box { background: white; padding: 2em; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 2em; }
+        .message { padding: 1em; margin-bottom: 1em; border-radius: 5px; }
+        .success { background-color: #e6f7e9; color: #1d643b; border: 1px solid #c3e6cb; }
+        .error { background-color: #fbebee; color: #c62828; border: 1px solid #f5c6cb; }
+        .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5em; }
+        .image-card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; }
+        .image-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
+        .image-card .info { padding: 1em; }
+        .info h3 { margin-top: 0; font-size: 1.1em; }
+        .info p { margin: 0.5em 0; }
+        .tags { font-size: 0.9em; color: #3498db; word-break: break-word; }
+        .description { font-size: 0.95em; color: #555; line-height: 1.4; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>AI 이미지 태그 및 설명 생성기</h1>
+
+    <div class="upload-box">
+        <div th:if="${successMessage}" class="message success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="message error" th:text="${errorMessage}"></div>
+        <form method="POST" action="/upload" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/*" required>
+            <button type="submit">이미지 업로드 & 분석</button>
+        </form>
+    </div>
+
+    <h2>분석된 이미지 목록</h2>
+    <div class="image-grid" th:if="${!images.isEmpty()}">
+        <div th:each="img : ${images}" class="image-card">
+            <!-- 이미지를 보여주기 위한 URL 매핑이 필요합니다 -->
+            <img th:src="@{/images/{filename}(filename=${img.savedFileName})}" alt="Uploaded Image">
+            <div class="info">
+                <h3><span th:text="${img.originalFileName}"></span></h3>
+                <p class="tags"><strong>태그:</strong> <span th:text="${img.tags}"></span></p>
+                <p class="description"><strong>설명:</strong> <span th:text="${img.description}"></span></p>
+            </div>
+        </div>
+    </div>
+    <div th:if="${images.isEmpty()}">
+        <p>아직 업로드된 이미지가 없습니다.</p>
+    </div>
+</div>
+</body>
+</html>
